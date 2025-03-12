@@ -1,4 +1,4 @@
-// 익명함수(Anonymous function)
+// 익명함수(Anonymous function) : 일회성으로 사용하기 때문에 메모리 절약
 function print(a) {
     console.log('print : ' + a);
 }
@@ -24,4 +24,3 @@ printArrow1('arrow1');
 // 함수 body가 return문 하나이거나, 한 줄인 경우 중괄호 생략 가능
 printArrow2 = (a) => console.log();
 printArrow2('arrow2');
-
