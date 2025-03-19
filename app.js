@@ -1,26 +1,17 @@
-const express = require('express');
+const express = require("express");
+const apiRoutes = require("./routes/api");
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send('Hello, Express! (GET) ');
-});
+// 라우팅
+app.use("/api", apiRoutes);
 
-app.get('/api/:person', (req, res) => {
-    const person = req.params.person;
-    res.status(200).send(person);
-});
-
-app.get('/api', (req, res) => {
-    res.status(200).send('Get API');
-});
-
-app.post('/api', (req, res) => {
-    res.status(200).send('Post API');
+app.get("/", (req, res) => {
+  res.send("Hello, Express! (GET) ");
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}/`);
+  console.log(`Server running at http://localhost:${PORT}/`);
 });
