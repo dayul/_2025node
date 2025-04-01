@@ -12,8 +12,6 @@ app.set('view engine', 'ejs');
 // path.join() : 경로 지정자( \ or / )를 운영체제와 맞추어 줌
 app.set('views', path.join(__dirname, 'views'));
 
-const travelList = ['뉴욕', '파리', '서울', '도쿄'];
-
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -34,7 +32,16 @@ app.get('/', (req, res) => {
 })
 
 app.get('/travel', (req, res) => {
-    res.render('travel', {travelList});
+    const _query = 'SELECT id, name FROM travelList';
+    db.query(_query, (err, results) => {
+        if(err) {
+            console.log("데이터베이스 쿼리 실패 : ", err);
+            res.status(500).send('Internal Server Error');
+            return;
+        }
+        const travelList = results;
+        res.render('travel', { travelList });
+    });
 })
 
 app.use((req, res) => {
