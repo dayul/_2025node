@@ -7,6 +7,9 @@ const { table } = require('console');
 dotenv.config();
 const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
 app.set('view engine', 'ejs');
 
 // __dirname 현재 디렉토리의 절대 경로 (C: 까지 나옴)
@@ -32,6 +35,7 @@ app.get('/', (req, res) => {
 
 })
 
+// READ
 app.get('/travel', (req, res) => {
     const _query = 'SELECT id, name FROM travelList';
     db.query(_query, (err, results) => {
@@ -43,7 +47,7 @@ app.get('/travel', (req, res) => {
         const travelList = results;
         res.render('travel', { travelList });
     });
-})
+});
 
 app.get('/travel/:id', (req, res) => {
     const travelId = req.params.id;
@@ -60,8 +64,22 @@ app.get('/travel/:id', (req, res) => {
         }
         const travel = result[0];
         res.render('travelDetail', { travel });
-    })
-})
+    });
+});
+
+// CREATE
+app.post('/travel', (req, res) => {
+    const { name } = req.body;
+    const _query = 'INSERT INTO travelList (name) VALUES (?)';
+    db.query(_query, [name], (err, results) => {
+        if(err) {
+            console.log('데이터베이스 쿼리 실패: ', err);
+            res.status(500).send('Internal Server Error');
+            return;
+        }
+        res.redirect('/travel');
+    });
+});
 
 // 모든 경로에 대해 처리 (나중에 404 처리예정)
 app.use((req, res) => {
