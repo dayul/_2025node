@@ -81,6 +81,10 @@ app.post('/travel', (req, res) => {
     });
 });
 
+app.get('/add-travel', (req, res) => {
+    res.render('addTravel');
+});
+
 // 모든 경로에 대해 처리 (나중에 404 처리예정)
 app.use((req, res) => {
 
