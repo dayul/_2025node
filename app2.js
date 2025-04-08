@@ -2,13 +2,15 @@ const express = require('express')
 const path = require('path');
 const mysql = require('mysql2');
 const dotenv = require('dotenv');
-const { table } = require('console');
+const methodOverride = require('method-override');
 
 dotenv.config();
 const app = express();
 
+// BODY를 파싱할 수 있도록
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(methodOverride('_method'));     // PUT을 사용하기 위해
 
 app.set('view engine', 'ejs');
 
@@ -93,6 +95,24 @@ app.put('/travel/:id', (req, res) => {
             return;
         }
         res.render('updateSuccess');
+    });
+});
+
+app.get('/travel/:id/edit', (req, res) => {
+    const travelId = req.params.id;
+    const query = 'SELECT * FROM travelList WHERE id = ?';
+    db.query(query, [travelId], (err, result) => {
+        if(err) {
+            console.error('데이터베이스 쿼리 실패: ', err);
+            res.status(500).send('Internal Server Error');
+            return;
+        }
+        if(result.length === 0) {
+            res.status(404).send('여행지를 찾을 수 없습니다.');
+            return;
+        }
+        const travel = result[0];
+        res.render('editTravel', { travel });
     });
 });
 
