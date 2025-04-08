@@ -81,6 +81,21 @@ app.post('/travel', (req, res) => {
     });
 });
 
+// UPDATE
+app.put('/travel/:id', (req, res) => {
+    const travelId = req.params.id;
+    const { name }  = req.body;
+    const _query = 'UPDATE travelList SET name=? WHERE id =?';
+    db.query(_query, [name, travelId], (err, results) => {
+        if(err) {
+            console.error('데이터베이스 쿼리 실패');
+            res.status(500).send('데이터베이스 서버 에러');
+            return;
+        }
+        res.render('updateSuccess');
+    });
+});
+
 app.get('/add-travel', (req, res) => {
     res.render('addTravel');
 });
