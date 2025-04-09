@@ -116,6 +116,20 @@ app.get('/travel/:id/edit', (req, res) => {
     });
 });
 
+// DELETE
+app.delete('/travel/:id', (req, res) => {
+    const travelId = req.params.id;
+    const _query = 'DELETE FROM travelList WHERE id = ?';
+    db.query(_query, [travelId], (err, results) => {
+        if(err) {
+            console.log('데이터베이스 쿼리 실패', err);
+            res.status(500).send('데이터베이스 서버 에러');
+            return;
+        }
+        res.render('deleteSuccess');
+    })
+})
+
 app.get('/add-travel', (req, res) => {
     res.render('addTravel');
 });
