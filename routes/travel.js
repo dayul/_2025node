@@ -1,13 +1,13 @@
-const db = require("../dbConnection");
+// const db = require("../dbConnection");
+const { TableHints } = require('sequelize');
+const Travel = require('../models/Travel');
 const express = require("express");
 const router = express.Router();
 
 // READ : 전체 게시글 조회
 router.get("/", async (req, res) => {
   try {
-    const _query = "SELECT id, name FROM travelList";
-    const [results] = await db.query(_query);
-    const travelList = results;
+    const travelList = await Travel.findAll({attributes: ['id', 'name']});
     res.render("travel", { travelList });
   } catch (err) {
     console.log("데이터베이스 쿼리 실패 : ", err);
@@ -25,8 +25,7 @@ router.get("/add", (req, res) => {
 router.post("/", async (req, res) => {
   const { name } = req.body;
   try {
-    const _query = "INSERT INTO travelList (name) VALUES (?)";
-    await db.query(_query, [name]);
+    await Travel.create({ name });
     res.redirect("/travel");
   } catch (err) {
     console.log("데이터베이스 쿼리 실패: ", err);
@@ -39,15 +38,13 @@ router.post("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const travelId = req.params.id;
   try {
-    const _query = "SELECT * FROM travelList WHERE id = ?";
-    const [results] = await db.query(_query, [travelId]);
+    const travel = await Travel.findByPk(travelId); 
 
-    if (results.length === 0) {
+    if (!travel) {
       res.status(404).send("여행지를 찾을 수 없습니다.");
       return;
     }
 
-    const travel = results[0];
     res.render("travelDetail", { travel });
   } catch (err) {
     console.error("데이터베이스 쿼리 실패: ", err);
@@ -59,15 +56,13 @@ router.get("/:id", async (req, res) => {
 router.get("/:id/edit", async (req, res) => {
   const travelId = req.params.id;
   try {
-    const _query = "SELECT * FROM travelList WHERE id = ?";
-    const [results] = await db.query(_query, [travelId]);
+    const travel = await Travel.findByPk(travelId);
 
-    if (results.length === 0) {
+    if (!travel) {
       res.status(404).send("여행지를 찾을 수 없습니다.");
       return;
     }
 
-    const travel = results[0];
     res.render("editTravel", { travel });
   } catch (err) {
     console.error("데이터베이스 쿼리 실패: ", err);
@@ -80,8 +75,14 @@ router.put("/:id", async (req, res) => {
   const travelId = req.params.id;
   const { name } = req.body;
   try {
-    const _query = "UPDATE travelList SET name=? WHERE id =?";
-    await db.query(_query, [name, travelId]);
+    const travel = await Travel.findByPk(travelId);
+
+    if (!travel) {
+      res.status(404).send("여행지를 찾을 수 없습니다.");
+      return;
+    }
+
+    await travel.update({ name });
     res.render("updateSuccess");
   } catch (err) {
     console.error("데이터베이스 쿼리 실패");
@@ -93,8 +94,14 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const travelId = req.params.id;
   try {
-    const _query = "DELETE FROM travelList WHERE id = ?";
-    await db.query(_query, [travelId]);
+    const travel = await Travel.findByPk(travelId);
+
+    if (!travel) {
+      res.status(404).send("여행지를 찾을 수 없습니다.");
+      return;
+    }
+
+    await travel.destroy();
     res.render("deleteSuccess");
   } catch (err) {
     console.log("데이터베이스 쿼리 실패", err);
